@@ -13,7 +13,13 @@
     {
       "matches": [
         "https://maang.in/problems/*",
-        "https://leetcode.com/*"
+        "https://leetcode.com/*",
+        "https://codeforces.com/*",
+        "https://www.hackerrank.com/*",
+        "https://www.geeksforgeeks.org/*",
+        "https://www.interviewbit.com/*",
+        "https://www.codingninjas.com/*"
+
       ],
       "js": [
         "content.js"

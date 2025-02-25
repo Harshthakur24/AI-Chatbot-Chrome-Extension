@@ -55,7 +55,7 @@ function createChatBot() {
     justify-content: space-between;
     align-items: center;
   `;
-  chatHeader.textContent = 'DSA Helper';
+  chatHeader.textContent = 'DSA Mentor Chat Bot';
   
   const closeButton = document.createElement('button');
   closeButton.textContent = '✕';
@@ -92,7 +92,7 @@ function createChatBot() {
     flex: 1;
     padding: 10px;
     border: 1px solid #555;
-    border-radius: 4px;
+    border-radius: 20px;
     margin-right: 8px;
     font-size: 14px;
     background-color: #333;
@@ -101,12 +101,12 @@ function createChatBot() {
 
   const sendButton = document.createElement('button');
   sendButton.className = 'chatbot-send-btn';
-  sendButton.textContent = 'Send';
+  sendButton.textContent = 'Ask';
   sendButton.style.cssText = `
     background-color: #2563eb;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 20px;
     padding: 10px 15px;
     cursor: pointer;
     font-size: 14px;
@@ -125,7 +125,7 @@ function createChatBot() {
   
   document.body.appendChild(chatBotContainer);
 
-  addMessage('bot', 'Hi! I can help you solve DSA problems. Ask me anything about the current problem!', chatMessages);
+  addMessage('bot', 'Hi! My name is Harsh, I can help you solve DSA problems. Ask me anything about the current problem!', chatMessages);
 
   toggleButton.addEventListener('click', () => {
     if (chatPanel.style.display === 'none') {
@@ -271,7 +271,7 @@ function getProblemInfo() {
 async function sendToGemini(userQuestion, problemInfo, chatMessagesElement) {
   const thinkingId = 'thinking-' + Date.now();
   
-  addMessage('bot', 'Got it, Let me think about this..', chatMessagesElement);
+  addMessage('bot', 'Got it, Let me think about this...', chatMessagesElement);
   
   try {
     const prompt = `
@@ -291,19 +291,20 @@ async function sendToGemini(userQuestion, problemInfo, chatMessagesElement) {
       
       USER QUESTION: ${userQuestion}
 
-      You are a knowledgeable and supportive DSA (Data Structures and Algorithms) mentor and problem-solving assistant. Your goal is to guide the user toward understanding and solving coding problems rather than simply providing direct answers.
+      Your name is Harsh, You are a knowledgeable and supportive DSA (Data Structures and Algorithms) mentor and problem-solving assistant. Your goal is to guide the user toward understanding and solving coding problems rather than simply providing direct answers.
 
 When presented with a problem, follow this structured approach:
 
-Never give the code unless the user explicitly asks for it.
+Never give the code unless the user explicitly asks for it and if asked only give code in c++.
 Avoid using unnecessary formatting like bold or headers.
+Only answer related to DSA and Coding question.
 Start by understanding the user's question and provide only hints at first.
 Encourage the user to think through the problem, ask guiding questions, and help them break it down logically.
 Once the user has attempted an approach or needs more help, guide them step by step toward an optimal solution.
 Only provide the code when the user specifically requests it.
 Your personality is that of a friendly and patient DSA mentor. Respond in a simple, conversational manner, like a human teacher guiding a student. Keep explanations clear and concise without sounding robotic.
 
- Keep the conversation natural and in type of wording or language of user and  engaging to create the feeling of a real mentor-student interaction. Answer in user like language.
+ Keep the conversation natural and in type of wording or language of user but in english alphabets (like "are bhai ye  question aise hoga" if user asks in hindi) and  engaging to create the feeling of a real mentor-student interaction. Answer in user like language.
     `;
     
     const requestBody = {
