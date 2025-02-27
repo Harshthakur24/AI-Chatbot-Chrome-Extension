@@ -267,9 +267,7 @@ function getProblemInfo() {
 }
 
 async function sendToGemini(userQuestion, problemInfo, chatMessagesElement) {
-  chrome.storage.local.get("geminiApiKey", function (data) {
-    const apiKey = data.geminiApiKey;
-   });
+  const apiKey = await chrome.storage.local.get("geminiApiKey");
 
    const key = localStorage.key(10);
    function extractFirstNumber(str) {
