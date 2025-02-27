@@ -188,8 +188,7 @@ function getProblemInfo() {
   
   const titleContainer = document.querySelector('.coding_desc_container_RD00M');
   if (titleContainer) {
-    const headingElement = titleContainer.querySelector('h1, h2, h3, h4, h5') || 
-                         titleContainer.firstElementChild;
+    const headingElement = titleContainer.querySelector('h1, h2, h3, h4, h5') || titleContainer.firstElementChild;
     if (headingElement) {
       title = headingElement.textContent.trim();
     }
@@ -272,6 +271,26 @@ async function sendToGemini(userQuestion, problemInfo, chatMessagesElement) {
     const apiKey = data.geminiApiKey;
    });
 
+   const key = localStorage.key(10);
+   function extractFirstNumber(str) {
+    const match = str.match(/_(\d+)_/);
+    return match ? match[1] : null;
+   }
+
+   const UserId = extractFirstNumber(key)
+
+   function extractQuestionNumber(url) {
+    const match = url.match(/-(\d+)$/);
+    return match ? match[1] : null;
+   }
+   const URLofPage = window.location.href;
+
+   const questionNumber = extractQuestionNumber(URLofPage);
+   const Language = document.querySelector(".ant-select-selection-item").innerText.trim();
+   const QuestionCodeKey = "course_" + UserId + "_" + questionNumber + '_' + Language;
+
+   const code = chrome.storage.local.get(QuestionCodeKey);
+
   const API_KEY = apiKey;
   const context = chrome.storage.local.get("Context_" + problemInfo.title);
 
@@ -297,6 +316,7 @@ async function sendToGemini(userQuestion, problemInfo, chatMessagesElement) {
       \`\`\`
       
       USER QUESTION: ${userQuestion}
+      This is the current code written by the User:- ${code || "No code available"}
 
       Your name is Harsh, You are a knowledgeable and supportive DSA (Data Structures and Algorithms) mentor and problem-solving assistant. Your goal is to guide the user toward understanding and solving coding problems rather than simply providing direct answers.
 
