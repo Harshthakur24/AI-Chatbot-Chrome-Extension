@@ -376,16 +376,22 @@ function setupMutationObserver() {
 }
 
 
-window.addEventListener('load', () => {
-  createChatBot();
-  setupMutationObserver();
-  
+function shouldRunChatBot() {
+  return window.location.href.startsWith("https://maang.in/problems/");
+}
 
-  console.log('DSA Helper Extension loaded and ready');
+window.addEventListener("load", () => {
+  if (shouldRunChatBot()) {
+      createChatBot();
+      setupMutationObserver();
+      console.log("DSA Helper Extension loaded and ready");
+  }
 });
 
-
-if (document.readyState === 'complete' || document.readyState === 'interactive') {
-  createChatBot();
-  setupMutationObserver();
+if (document.readyState === "complete" || document.readyState === "interactive") {
+  if (shouldRunChatBot()) {
+      createChatBot();
+      setupMutationObserver();
+  }
 }
+
