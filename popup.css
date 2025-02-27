@@ -1,43 +1,62 @@
-.container {
-    width: 280px;
-    color: #314d3e;
-}
-
-.title {
-    font-size: 14px;
-    font-weight: bold;
-    padding: 8px;
-}
-
-.bookmarks {
-    margin: 5px 5px;
-    padding: 3px;
-}
-
-.bookmark {
+/* Center the popup on the page */
+body {
+    margin: 0;
     display: flex;
-    border-bottom-color: #00254d;
-    border-bottom-width: 1px;
-    border-bottom-style: solid;
-    border-radius: 0.8rem;
-    padding: 3px;
-    padding-bottom: 7px;
-    margin-bottom: 7px;
-}
-
-.bookmark-title {
-    padding-left: 2px;
-    width: 180px;
-}
-
-.bookmark-controls img {
-    margin: 0 4px;
-    width: 18px;
-    height: 18px;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: #f4f4f4;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Main container with extra rounding and deeper shadow */
+  .container {
+    background: #fff;
+    width: 300px;
+    padding: 30px;
+    border-radius: 20px; /* Increased for a rounder look */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    text-align: center;
+  }
+  
+  h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    transition: border-color 0.3s ease;
+  }
+  
+  input:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+  
+  button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
     cursor: pointer;
-}
-
-.bookmark-controls {
-    flex: auto;
-    text-align: right;
-}
+    font-size: 16px;
+    transition: background 0.3s ease;
+  }
+  
+  button:hover {
+    background: linear-gradient(135deg, #0056b3, #003f7f);
+  }
+  
+  #statusMessage {
+    font-size: 14px;
+    margin-top: 15px;
+    color: #28a745;
+  }

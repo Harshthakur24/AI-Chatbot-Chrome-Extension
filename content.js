@@ -1,4 +1,3 @@
-const API_KEY = "AIzaSyApFhuZhm8GLTdxAed2cCoDu5t9Mr4O4AQ";
 const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
 
 function createChatBot() {
@@ -269,12 +268,20 @@ function getProblemInfo() {
 }
 
 async function sendToGemini(userQuestion, problemInfo, chatMessagesElement) {
+  chrome.storage.local.get("geminiApiKey", function (data) {
+    const apiKey = data.geminiApiKey;
+   });
+
+  const API_KEY = apiKey;
+  const context = chrome.storage.local.get("Context_" + problemInfo.title);
+
   const thinkingId = 'thinking-' + Date.now();
   
   addMessage('bot', 'Got it, Let me think about this...', chatMessagesElement);
   
   try {
     const prompt = `
+      Previous chat of your's with user:- ${context || ""}
       PROBLEM INFORMATION:
       Title: ${problemInfo.title || "Unknown problem title"}
       URL: ${problemInfo.url}
@@ -346,6 +353,14 @@ Your personality is that of a friendly and patient DSA mentor. Respond in a simp
       
       const responseText = data.candidates[0].content.parts[0].text;
       addMessage('bot', responseText, chatMessagesElement);
+
+      chrome.storage.local.set({ 
+        [`Context_${problemInfo.title}`]: {
+          question: context.question + userQuestion,
+          answer: context.answer + responseText
+        } 
+      });      
+    
     } else {
       throw new Error('Unexpected API response format');
     }
