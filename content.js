@@ -1,5 +1,3 @@
-
-
 function createChatBot() {
   const chatBotContainer = document.createElement('div');
   chatBotContainer.className = 'helper-chatbot';
@@ -13,7 +11,7 @@ function createChatBot() {
 
   const toggleButton = document.createElement('button');
   toggleButton.className = 'chatbot-toggle-btn';
-  toggleButton.textContent = '💬 Need Some Help?';
+  toggleButton.textContent = '🤖 Need Help?';
   toggleButton.style.cssText = `
     background-color: #2563eb;
     color: white;
@@ -306,7 +304,6 @@ async function sendToGemini(userQuestion, problemInfo, chatMessagesElement) {
     const codeObj = await chrome.storage.local.get(QuestionCodeKey);
     const code = codeObj[QuestionCodeKey] || "No code available";
 
-    // Properly retrieve the context with await
     const contextKey = "Context_" + problemInfo.title;
     const contextObj = await chrome.storage.local.get(contextKey);
     const context = contextObj[contextKey] || { question: "", answer: "" };
@@ -432,8 +429,19 @@ function setupMutationObserver() {
 }
 
 function shouldRunChatBot() {
-  return window.location.href.startsWith("https://maang.in/problems/");
+  const allowedURLs = [
+    "https://maang.in/problems/",
+    "https://leetcode.com/",
+    "https://codeforces.com/",
+    "https://www.hackerrank.com/",
+    "https://www.geeksforgeeks.org/",
+    "https://www.interviewbit.com/",
+    "https://www.codingninjas.com/"
+  ];
+
+  return allowedURLs.some(url => window.location.href.startsWith(url));
 }
+
 
 window.addEventListener("load", () => {
   if (shouldRunChatBot()) {
