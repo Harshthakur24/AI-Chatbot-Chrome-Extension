@@ -1,4 +1,4 @@
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
+
 
 function createChatBot() {
   const chatBotContainer = document.createElement('div');
@@ -267,38 +267,54 @@ function getProblemInfo() {
 }
 
 async function sendToGemini(userQuestion, problemInfo, chatMessagesElement) {
-  const apiKey = await chrome.storage.local.get("geminiApiKey");
-
-   const key = localStorage.key(10);
-   function extractFirstNumber(str) {
-    const match = str.match(/_(\d+)_/);
-    return match ? match[1] : null;
-   }
-
-   const UserId = extractFirstNumber(key)
-
-   function extractQuestionNumber(url) {
-    const match = url.match(/-(\d+)$/);
-    return match ? match[1] : null;
-   }
-   const URLofPage = window.location.href;
-
-   const questionNumber = extractQuestionNumber(URLofPage);
-   const Language = document.querySelector(".ant-select-selection-item").innerText.trim();
-   const QuestionCodeKey = "course_" + UserId + "_" + questionNumber + '_' + Language;
-
-   const code = chrome.storage.local.get(QuestionCodeKey);
-
-  const API_KEY = apiKey;
-  const context = chrome.storage.local.get("Context_" + problemInfo.title);
-
-  const thinkingId = 'thinking-' + Date.now();
-  
-  addMessage('bot', 'Got it, Let me think about this...', chatMessagesElement);
-  
   try {
+    // Properly retrieve the API key with await and extract the value from the returned object
+    const apiKeyObj = await chrome.storage.local.get("geminiApiKey");
+    const API_KEY = apiKeyObj.geminiApiKey;
+    
+    if (!API_KEY) {
+      addMessage('bot', 'API key not found. Please set your Gemini API key in the extension settings.', chatMessagesElement);
+      return;
+    }
+
+    const key = localStorage.key(10);
+    function extractFirstNumber(str) {
+      const match = str.match(/_(\d+)_/);
+      return match ? match[1] : null;
+    }
+
+    const UserId = extractFirstNumber(key);
+
+    function extractQuestionNumber(url) {
+      const match = url.match(/-(\d+)$/);
+      return match ? match[1] : null;
+    }
+    
+    const URLofPage = window.location.href;
+    const questionNumber = extractQuestionNumber(URLofPage);
+    
+    // Safely get the language
+    let Language = "unknown";
+    const languageElement = document.querySelector(".ant-select-selection-item");
+    if (languageElement) {
+      Language = languageElement.innerText.trim();
+    }
+    
+    const QuestionCodeKey = "course_" + UserId + "_" + questionNumber + '_' + Language;
+
+    // Properly retrieve the code with await
+    const codeObj = await chrome.storage.local.get(QuestionCodeKey);
+    const code = codeObj[QuestionCodeKey] || "No code available";
+
+    // Properly retrieve the context with await
+    const contextKey = "Context_" + problemInfo.title;
+    const contextObj = await chrome.storage.local.get(contextKey);
+    const context = contextObj[contextKey] || { question: "", answer: "" };
+
+    addMessage('bot', 'Got it, Let me think about this...', chatMessagesElement);
+    
     const prompt = `
-      Previous chat of your's with user:- ${context || ""}
+      Previous chat of your's with user:- ${JSON.stringify(context) || ""}
       PROBLEM INFORMATION:
       Title: ${problemInfo.title || "Unknown problem title"}
       URL: ${problemInfo.url}
@@ -318,18 +334,18 @@ async function sendToGemini(userQuestion, problemInfo, chatMessagesElement) {
 
       Your name is Harsh, You are a knowledgeable and supportive DSA (Data Structures and Algorithms) mentor and problem-solving assistant. Your goal is to guide the user toward understanding and solving coding problems rather than simply providing direct answers.
 
-When presented with a problem, follow this structured approach:
+      When presented with a problem, follow this structured approach:
 
-Never give the code unless the user explicitly asks for it and if asked only give code in c++.
-Avoid using unnecessary formatting like bold or headers.
-Only answer related to DSA and Coding question.
-Start by understanding the user's question and provide only hints at first.
-Encourage the user to think through the problem, ask guiding questions, and help them break it down logically.
-Once the user has attempted an approach or needs more help, guide them step by step toward an optimal solution.
-Only provide the code when the user specifically requests it.
-Your personality is that of a friendly and patient DSA mentor. Respond in a simple, conversational manner, like a human teacher guiding a student. Keep explanations clear and concise without sounding robotic.
+      Never give the code unless the user explicitly asks for it and if asked only give code in c++.
+      Avoid using unnecessary formatting like bold or headers.
+      Only answer related to DSA and Coding question.
+      Start by understanding the user's question and provide only hints at first.
+      Encourage the user to think through the problem, ask guiding questions, and help them break it down logically.
+      Once the user has attempted an approach or needs more help, guide them step by step toward an optimal solution.
+      Only provide the code when the user specifically requests it.
+      Your personality is that of a friendly and patient DSA mentor. Respond in a simple, conversational manner, like a human teacher guiding a student. Keep explanations clear and concise without sounding robotic.
 
- Keep the conversation natural and in type of wording or language of user but in english alphabets (like "are bhai ye  question aise hoga" if user asks in hindi) and  engaging to create the feeling of a real mentor-student interaction. Answer in user like language.
+      Keep the conversation natural and in type of wording or language of user but in english alphabets (like "are bhai ye question aise hoga" if user asks in hindi) and engaging to create the feeling of a real mentor-student interaction. Answer in user like language.
     `;
     
     const requestBody = {
@@ -346,7 +362,7 @@ Your personality is that of a friendly and patient DSA mentor. Respond in a simp
       }
     };
     
-    const response = await fetch(`${GEMINI_API_URL}?key=${API_KEY}`, {
+    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyDDtzrUjYr-O6r5cWJB-bbpWLihiy8IWBY', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -360,8 +376,13 @@ Your personality is that of a friendly and patient DSA mentor. Respond in a simp
     
     const data = await response.json();
     
-    if (chatMessagesElement.lastChild) {
-      chatMessagesElement.removeChild(chatMessagesElement.lastChild);
+    // Remove the "thinking" message
+    const thinkingMessages = chatMessagesElement.querySelectorAll('.message-bot');
+    for (const msg of thinkingMessages) {
+      if (msg.textContent === 'Got it, Let me think about this...') {
+        chatMessagesElement.removeChild(msg);
+        break;
+      }
     }
     
     if (data.candidates && data.candidates.length > 0 && 
@@ -372,12 +393,13 @@ Your personality is that of a friendly and patient DSA mentor. Respond in a simp
       const responseText = data.candidates[0].content.parts[0].text;
       addMessage('bot', responseText, chatMessagesElement);
 
-      chrome.storage.local.set({ 
-        [`Context_${problemInfo.title}`]: {
-          question: context.question + userQuestion,
-          answer: context.answer + responseText
+      // Properly update the context
+      await chrome.storage.local.set({ 
+        [contextKey]: {
+          question: (context.question || "") + "\n\nUser: " + userQuestion,
+          answer: (context.answer || "") + "\n\nHarsh: " + responseText
         } 
-      });      
+      });
     
     } else {
       throw new Error('Unexpected API response format');
@@ -386,9 +408,10 @@ Your personality is that of a friendly and patient DSA mentor. Respond in a simp
   } catch (error) {
     console.error('Error calling Gemini API:', error);
     
+    // Remove the "thinking" message if it exists
     const thinkingMessages = chatMessagesElement.querySelectorAll('.message-bot');
     for (const msg of thinkingMessages) {
-      if (msg.textContent === 'Thinking...') {
+      if (msg.textContent === 'Got it, Let me think about this...' || msg.textContent === 'Thinking...') {
         chatMessagesElement.removeChild(msg);
         break;
       }
@@ -408,7 +431,6 @@ function setupMutationObserver() {
   observer.observe(document.body, { childList: true, subtree: true });
 }
 
-
 function shouldRunChatBot() {
   return window.location.href.startsWith("https://maang.in/problems/");
 }
@@ -427,4 +449,3 @@ if (document.readyState === "complete" || document.readyState === "interactive")
       setupMutationObserver();
   }
 }
-
