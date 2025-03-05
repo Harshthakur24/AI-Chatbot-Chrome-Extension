@@ -266,7 +266,6 @@ function getProblemInfo() {
 
 async function sendToGemini(userQuestion, problemInfo, chatMessagesElement) {
   try {
-    // Properly retrieve the API key with await and extract the value from the returned object
     const apiKeyObj = await chrome.storage.local.get("geminiApiKey");
     const API_KEY = apiKeyObj.geminiApiKey;
     
@@ -299,10 +298,7 @@ async function sendToGemini(userQuestion, problemInfo, chatMessagesElement) {
     }
     
     const QuestionCodeKey = "course_" + UserId + "_" + questionNumber + '_' + Language;
-
-    // Properly retrieve the code with await
-    const codeObj = await chrome.storage.local.get(QuestionCodeKey);
-    const code = codeObj[QuestionCodeKey] || "No code available";
+    const code = localStorage.getItem(QuestionCodeKey);
 
     const contextKey = "Context_" + problemInfo.title;
     const contextObj = await chrome.storage.local.get(contextKey);
@@ -390,7 +386,6 @@ async function sendToGemini(userQuestion, problemInfo, chatMessagesElement) {
       const responseText = data.candidates[0].content.parts[0].text;
       addMessage('bot', responseText, chatMessagesElement);
 
-      // Properly update the context
       await chrome.storage.local.set({ 
         [contextKey]: {
           question: (context.question || "") + "\n\nUser: " + userQuestion,
