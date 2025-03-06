@@ -273,8 +273,16 @@ async function sendToGemini(userQuestion, problemInfo, chatMessagesElement) {
       addMessage('bot', 'API key not found. Please set your Gemini API key in the extension settings.', chatMessagesElement);
       return;
     }
-
-    const key = localStorage.key(10);
+    function findCourseKey() {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith("course")) {
+          return key;
+        }
+      }
+      return null; 
+    }
+    const key = findCourseKey();
     function extractFirstNumber(str) {
       const match = str.match(/_(\d+)_/);
       return match ? match[1] : null;
