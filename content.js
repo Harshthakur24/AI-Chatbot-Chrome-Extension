@@ -44,7 +44,7 @@ function createChatBot() {
   const chatHeader = document.createElement('div');
   chatHeader.className = 'chatbot-header';
   chatHeader.style.cssText = `
-    background-color: #2563eb;
+    background-color: #2B384E;
     color: white;
     padding: 10px 15px;
     font-weight: bold;
@@ -70,7 +70,7 @@ function createChatBot() {
     flex: 1;
     padding: 15px;
     overflow-y: auto;
-    background-color: #252525;
+    background-color: #1F2836;
   `;
 
   const inputContainer = document.createElement('div');
