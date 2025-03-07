@@ -297,6 +297,71 @@ async function sendToGemini(userQuestion, problemInfo, chatMessagesElement) {
     
     const URLofPage = window.location.href;
     const questionNumber = extractQuestionNumber(URLofPage);
+
+    //getting the hints
+
+    function clickHints() {
+      // Find element containing "Hints" text
+      const elements = Array.from(document.querySelectorAll("li"));
+      const hintsElement = elements.find(el => el.textContent.includes("Hints"));
+      
+      if (hintsElement) {
+        hintsElement.click();
+        console.log("Clicked the Hints button");
+      } else {
+        console.log("Hints button not found");
+      }
+    }
+    function clickDescription() {
+      // Find element containing "Description" text
+      const descriptionElement = Array.from(document.querySelectorAll("li"))
+        .find(el => el.textContent.includes("Description"));
+      
+      if (descriptionElement) {
+        descriptionElement.click();
+        console.log("Clicked the Description button");
+      } else {
+        console.log("Description button not found");
+      }
+    }
+    
+    
+    
+    // Execute the function
+    clickHints();
+
+    async function getHints() {
+      const hints = {};
+  
+      async function clickAndExtractHint(hintText) {
+          const hintButton = [...document.querySelectorAll('.coding_border__67F3C')]
+              .find(el => el.innerText.includes(hintText));
+  
+          if (hintButton) {
+              hintButton.click(); // Click to expand
+              await new Promise(resolve => setTimeout(resolve, 1500)); // Wait for content to load
+              
+              // Extract hint content
+              let contentElement = hintButton.parentElement?.nextElementSibling?.querySelector('.problem_paragraph');
+              if (contentElement) {
+                  hints[hintText] = contentElement.textContent.trim();
+              }
+          }
+      }
+  
+      await clickAndExtractHint("Hint 1");
+      await clickAndExtractHint("Hint 2");
+  
+      console.log(hints);
+  }
+  
+  getHints();
+  clickDescription()
+  
+  
+  
+
+    
     
     // Safely get the language
     let Language = "unknown";
@@ -304,14 +369,17 @@ async function sendToGemini(userQuestion, problemInfo, chatMessagesElement) {
     if (languageElement) {
       Language = languageElement.innerText.trim();
     }
+
+    
     
     const QuestionCodeKey = "course_" + UserId + "_" + questionNumber + '_' + Language;
     const code = localStorage.getItem(QuestionCodeKey);
-
+    
     const contextKey = "Context_" + problemInfo.title;
     const contextObj = await chrome.storage.local.get(contextKey);
     const context = contextObj[contextKey] || { question: "", answer: "" };
 
+    
     addMessage('bot', 'Got it, Let me think about this...', chatMessagesElement);
     
     const prompt = `
